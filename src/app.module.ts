@@ -2,23 +2,24 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ArticlesService } from './articles/articles.service';
-import { ArticlesController } from './articles/articles.controller';
 import { ArticlesModule } from './articles/articles.module';
 import { dataSourceOptions } from './database';
+import { AuthModule } from './auth/auth.module';
+import { I18nModule } from 'nestjs-i18n';
+import { i18nConfig } from './i18n/i18n-config';
 
 @Module({
   imports: [
     UsersModule,
     ArticlesModule,
+    AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    I18nModule.forRoot(i18nConfig),
   ],
-  controllers: [AppController, ArticlesController, UsersController],
-  providers: [AppService, ArticlesService, UsersService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
