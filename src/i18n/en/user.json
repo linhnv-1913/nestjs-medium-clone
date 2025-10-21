@@ -1,3 +1,5 @@
 {
-  "created": "User created"
+  "created": "User created",
+  "userNotFound": "User not found",
+  "duplicate_email": "Email has already been taken"
 }

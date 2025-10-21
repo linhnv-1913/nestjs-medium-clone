@@ -4,10 +4,22 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
 import { DEFAULT_VERSION } from './constants';
 import { ConfigService } from '@nestjs/config';
-import { I18nValidationPipe, I18nValidationExceptionFilter } from 'nestjs-i18n';
+import {
+  I18nValidationPipe,
+  I18nValidationExceptionFilter,
+  I18nService,
+} from 'nestjs-i18n';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import { HttpExceptionFilter } from './filter/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: DEFAULT_VERSION,
@@ -21,7 +33,11 @@ async function bootstrap() {
     }),
   );
 
+  const i18nService =
+    app.get<I18nService<Record<string, unknown>>>(I18nService);
+
   app.useGlobalFilters(
+    new HttpExceptionFilter(i18nService),
     new I18nValidationExceptionFilter({
       detailedErrors: false,
     }),
