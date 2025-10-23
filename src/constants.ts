@@ -6,3 +6,7 @@ export const USERNAME_MAX_LENGTH = 30;
 export const DEFAULT_LANGUAGE = 'en';
 export const DEFAULT_I18N_DIR = '/';
 export const PASSWORD_MIN_LENGTH = 8;
+export const PSQL_UNIQUE_VIOLATION_CODE = '23505';
+export const UPLOAD_IMAGE_PATH = 'uploads/images';
+export const IMAGE_MAX_SIZE = 5 * 1024 * 1024; // 5MB
+export const IMAGE_FILE_TYPE = /(jpg|jpeg|png|gif)$/;
