@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -27,6 +28,7 @@ import { AuthResponseDto } from 'src/auth/dto/auth-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from './users.service';
 import { UpdateDto } from './dto/update.dto';
+import { ListUsersDto } from './dto/list-users.dto';
 import { IMAGE_FILE_TYPE, IMAGE_MAX_SIZE } from 'src/constants';
 
 @Controller('api/users')
@@ -92,5 +94,13 @@ export class UsersController {
     file?: Express.Multer.File,
   ) {
     return this.usersService.update(user.id, updateDto, file);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List all users' })
+  async listUsers(@Query() listUsersDto: ListUsersDto) {
+    return this.usersService.listUsers(listUsersDto.page, listUsersDto.limit);
   }
 }

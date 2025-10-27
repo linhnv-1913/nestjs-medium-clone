@@ -7,6 +7,11 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/user.entity';
 import { UpdateDto } from './dto/update.dto';
 import { UploadService } from 'src/upload/upload.service';
+import {
+  DEFAULT_ORDER,
+  DEFAULT_PAGINATION_LIMIT,
+  DEFAULT_PAGINATION_PAGE,
+} from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -56,5 +61,19 @@ export class UsersService {
     Object.assign(user, updateDto);
 
     return await this.userRepository.save(user);
+  }
+
+  async listUsers(
+    page: number = DEFAULT_PAGINATION_PAGE,
+    limit: number = DEFAULT_PAGINATION_LIMIT,
+  ): Promise<{ users: User[]; total: number }> {
+    const [users, total] = await this.userRepository.findAndCount({
+      select: ['id', 'email', 'username', 'bio', 'image'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: DEFAULT_ORDER },
+    });
+
+    return { users, total };
   }
 }

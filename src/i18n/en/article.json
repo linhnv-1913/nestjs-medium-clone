@@ -1,0 +1,5 @@
+{
+  "notFound": "Article not found",
+  "duplicate_slug": "Article slug already exists",
+  "created": "Article created"
+}
