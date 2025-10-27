@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+import { VersioningType, ClassSerializerInterceptor } from '@nestjs/common';
 import { DEFAULT_VERSION } from './constants';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -12,6 +12,7 @@ import {
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
+import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -24,6 +25,8 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: DEFAULT_VERSION,
   });
+
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.useGlobalPipes(
     new I18nValidationPipe({
