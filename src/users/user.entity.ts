@@ -1,6 +1,7 @@
 import { Entity, Column } from 'typeorm';
 import { BaseEntity } from 'src/database/base.entity';
 import { USERNAME_MAX_LENGTH } from 'src/constants';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User extends BaseEntity {
@@ -10,6 +11,7 @@ export class User extends BaseEntity {
   @Column({ length: USERNAME_MAX_LENGTH })
   username: string;
 
+  @Exclude()
   @Column()
   password: string;
 

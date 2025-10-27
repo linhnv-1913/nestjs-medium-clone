@@ -1,5 +1,5 @@
 import { User } from 'src/users/user.entity';
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from 'src/database/base.entity';
 import {
   BODY_MAX_LENGTH,
@@ -30,6 +30,10 @@ export class Article extends BaseEntity {
   @Column({ default: DEFAULT_FAVORITE_COUNT })
   favoritesCount: number;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'authorId' })
   author: User;
+
+  @Column()
+  authorId: number;
 }

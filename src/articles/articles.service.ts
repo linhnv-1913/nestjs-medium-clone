@@ -1,4 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Article } from './article.entity';
+import { CreateArticleDto } from './dto/create-article.dto';
+import { User } from 'src/users/user.entity';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
-export class ArticlesService {}
+export class ArticlesService {
+  constructor(
+    @InjectRepository(Article)
+    private readonly articleRepository: Repository<Article>,
+    private readonly i18n: I18nService,
+  ) {}
+
+  async create(
+    createArticleDto: CreateArticleDto,
+    author: User,
+  ): Promise<Article> {
+    const slug = this.generateSlug(createArticleDto.title);
+
+    const article = this.articleRepository.create({
+      ...createArticleDto,
+      slug,
+      author,
+    });
+
+    await this.articleRepository.save(article);
+    return this.i18n.t('article.created');
+  }
+
+  async findById(id: number): Promise<Article> {
+    const article = await this.articleRepository.findOne({
+      where: { id },
+    });
+
+    if (!article) {
+      throw new NotFoundException(this.i18n.t('article.notFound'));
+    }
+
+    return article;
+  }
+
+  private generateSlug(title: string): string {
+    const slug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const timestamp = Date.now();
+    return `${slug}-${timestamp}`;
+  }
+}
