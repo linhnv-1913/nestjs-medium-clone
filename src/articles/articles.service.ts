@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Article } from './article.entity';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { User } from 'src/users/user.entity';
 import { I18nService } from 'nestjs-i18n';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -31,15 +36,27 @@ export class ArticlesService {
   }
 
   async findById(id: number): Promise<Article> {
-    const article = await this.articleRepository.findOne({
-      where: { id },
-    });
+    return this.findArticleOrFail(id);
+  }
 
-    if (!article) {
-      throw new NotFoundException(this.i18n.t('article.notFound'));
+  async update(
+    updateArticleDto: UpdateArticleDto,
+    id: number,
+    author: User,
+  ): Promise<Article> {
+    const article = await this.findArticleOrFail(id);
+
+    if (article.authorId !== author.id) {
+      throw new ForbiddenException(this.i18n.t('article.forbidden'));
     }
 
-    return article;
+    let slug = article.slug;
+    if (updateArticleDto.title) {
+      slug = this.generateSlug(updateArticleDto.title);
+    }
+
+    Object.assign(article, updateArticleDto, { slug });
+    return await this.articleRepository.save(article);
   }
 
   private generateSlug(title: string): string {
@@ -52,5 +69,17 @@ export class ArticlesService {
 
     const timestamp = Date.now();
     return `${slug}-${timestamp}`;
+  }
+
+  private async findArticleOrFail(id: number): Promise<Article> {
+    const article = await this.articleRepository.findOne({
+      where: { id },
+    });
+
+    if (!article) {
+      throw new NotFoundException(this.i18n.t('article.notFound'));
+    }
+
+    return article;
   }
 }

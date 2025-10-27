@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,10 +35,7 @@ export class UsersService {
     updateDto: Partial<UpdateDto>,
     file?: Express.Multer.File,
   ): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new Error(this.i18n.t('user.userNotFound'));
-    }
+    const user = await this.findUserOrFail(userId);
 
     if (file) {
       if (user.image) {
@@ -56,5 +53,17 @@ export class UsersService {
     Object.assign(user, updateDto);
 
     return await this.userRepository.save(user);
+  }
+
+  private async findUserOrFail(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(this.i18n.t('user.notFound'));
+    }
+
+    return user;
   }
 }

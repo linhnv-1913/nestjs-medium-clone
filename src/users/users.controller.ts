@@ -23,11 +23,15 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth-guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from './user.entity';
-import { AuthResponseDto } from 'src/auth/dto/auth-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UsersService } from './users.service';
 import { UpdateDto } from './dto/update.dto';
 import { IMAGE_FILE_TYPE, IMAGE_MAX_SIZE } from 'src/constants';
+import {
+  ErrorResponse,
+  SuccessResponse,
+} from '../common/decorators/response.decorator';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Controller('api/users')
 export class UsersController {
@@ -35,19 +39,9 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Register new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'Registration successful, returns user info and JWT token',
-    type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'Email has already been taken',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validation error',
-  })
+  @ApiResponse(SuccessResponse(201, 'User created'))
+  @ApiResponse(ErrorResponse(409, 'Email has already been taken'))
+  @ApiResponse(ErrorResponse(400, 'Validation error'))
   async register(@Body() registerDto: RegisterDto) {
     return this.usersService.register(registerDto);
   }
@@ -56,6 +50,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse(
+    SuccessResponse(200, 'Profile retrieved successfully', UserResponseDto),
+  )
   getProfile(@CurrentUser() user: User) {
     return {
       id: user.id,
@@ -70,6 +67,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse(SuccessResponse(200, 'User updated'))
+  @ApiResponse(ErrorResponse(404, 'User not found'))
+  @ApiResponse(ErrorResponse(409, 'Email has already been taken'))
+  @ApiResponse(ErrorResponse(400, 'Validation error'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateDto })
   @UseInterceptors(

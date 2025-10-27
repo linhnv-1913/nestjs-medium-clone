@@ -42,7 +42,7 @@ export class AuthService {
     const tokenData = this.generateToken(user);
 
     return {
-      user: this.sanitizeUser(user),
+      user: user,
       ...tokenData,
     };
   }
@@ -76,10 +76,5 @@ export class AuthService {
       expires_in: expiresIn,
       expires_at: expiresAt.toISOString(),
     };
-  }
-
-  private sanitizeUser(user: User): Partial<User> {
-    const { id, username } = user;
-    return { id, username };
   }
 }

@@ -3,6 +3,10 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import {
+  ErrorResponse,
+  SuccessResponse,
+} from '../common/decorators/response.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -11,19 +15,9 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login' })
-  @ApiResponse({
-    status: 200,
-    description: 'Login successful, returns user info and JWT token',
-    type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Invalid email or password',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validation error',
-  })
+  @ApiResponse(SuccessResponse(200, 'Login successful', AuthResponseDto))
+  @ApiResponse(ErrorResponse(401, 'Invalid email or password'))
+  @ApiResponse(ErrorResponse(400, 'Validation error'))
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
