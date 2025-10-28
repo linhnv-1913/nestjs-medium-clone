@@ -1,11 +1,12 @@
 import { User } from 'src/users/user.entity';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/database/base.entity';
 import {
   BODY_MAX_LENGTH,
   DEFAULT_FAVORITE_COUNT,
   TITLE_MAX_LENGTH,
 } from 'src/constants';
+import { Comment } from 'src/article-comments/comment.entity';
 
 @Entity()
 export class Article extends BaseEntity {
@@ -36,4 +37,7 @@ export class Article extends BaseEntity {
 
   @Column()
   authorId: number;
+
+  @OneToMany(() => Comment, (comment) => comment.article)
+  comments: Comment[];
 }

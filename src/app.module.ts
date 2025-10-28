@@ -9,12 +9,14 @@ import { dataSourceOptions } from './database';
 import { AuthModule } from './auth/auth.module';
 import { I18nModule } from 'nestjs-i18n';
 import { i18nConfig } from './i18n/i18n-config';
+import { CommentsModule } from './article-comments/comments.module';
 
 @Module({
   imports: [
+    AuthModule,
     UsersModule,
     ArticlesModule,
-    AuthModule,
+    CommentsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(dataSourceOptions),
     I18nModule.forRoot(i18nConfig),

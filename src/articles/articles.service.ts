@@ -40,27 +40,27 @@ export class ArticlesService {
     return this.i18n.t('article.created');
   }
 
-  async findById(id: number): Promise<Article> {
-    return this.findArticleOrFail(id);
+  async findBySlug(slug: string): Promise<Article> {
+    return this.findOrFailArticle(slug);
   }
 
   async update(
     updateArticleDto: UpdateArticleDto,
-    id: number,
+    slug: string,
     author: User,
   ): Promise<Article> {
-    const article = await this.findArticleOrFail(id);
+    const article = await this.findOrFailArticle(slug);
 
     if (article.authorId !== author.id) {
       throw new ForbiddenException(this.i18n.t('article.forbidden'));
     }
 
-    let slug = article.slug;
+    let newSlug = article.slug;
     if (updateArticleDto.title) {
-      slug = this.generateSlug(updateArticleDto.title);
+      newSlug = this.generateSlug(updateArticleDto.title);
     }
 
-    Object.assign(article, updateArticleDto, { slug });
+    Object.assign(article, updateArticleDto, { slug: newSlug });
     return await this.articleRepository.save(article);
   }
 
@@ -77,8 +77,8 @@ export class ArticlesService {
     return { articles, total };
   }
 
-  async deleteById(id: number, author: User): Promise<Article> {
-    const article = await this.findArticleOrFail(id);
+  async delete(slug: string, author: User): Promise<Article> {
+    const article = await this.findOrFailArticle(slug);
 
     if (article.authorId !== author.id) {
       throw new ForbiddenException(this.i18n.t('article.forbidden'));
@@ -99,9 +99,9 @@ export class ArticlesService {
     return `${slug}-${timestamp}`;
   }
 
-  private async findArticleOrFail(id: number): Promise<Article> {
+  async findOrFailArticle(slug: string): Promise<Article> {
     const article = await this.articleRepository.findOne({
-      where: { id },
+      where: { slug },
     });
 
     if (!article) {
