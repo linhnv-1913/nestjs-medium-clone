@@ -7,6 +7,8 @@ import {
   UseGuards,
   ParseIntPipe,
   Put,
+  Query,
+  Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ArticlesService } from './articles.service';
@@ -20,6 +22,8 @@ import {
   ErrorResponse,
   SuccessResponse,
 } from '../common/decorators/response.decorator';
+import { createListResponseDto } from 'src/common/dto/list-response.dto';
+import { ListRequestDto } from 'src/common/dto/list-request.dto';
 
 @Controller('api/articles')
 export class ArticlesController {
@@ -64,5 +68,39 @@ export class ArticlesController {
     @CurrentUser() user: User,
   ) {
     return await this.articlesService.update(updateArticleDto, id, user);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List all articles' })
+  @ApiResponse(
+    SuccessResponse(
+      200,
+      'Articles retrieved successfully',
+      createListResponseDto(ArticleResponseDto, 'articles'),
+    ),
+  )
+  async listArticles(@Query() ListRequestDto: ListRequestDto) {
+    return this.articlesService.listArticles(
+      ListRequestDto.page,
+      ListRequestDto.limit,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete an article' })
+  @ApiResponse(SuccessResponse(200, 'Article deleted', ArticleResponseDto))
+  @ApiResponse(ErrorResponse(404, 'Article not found'))
+  @ApiResponse(
+    ErrorResponse(403, 'You are not authorized to delete this article'),
+  )
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+  ) {
+    return await this.articlesService.deleteById(id, user);
   }
 }
