@@ -10,6 +10,11 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { User } from 'src/users/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import {
+  DEFAULT_ORDER,
+  DEFAULT_PAGINATION_LIMIT,
+  DEFAULT_PAGINATION_PAGE,
+} from 'src/constants';
 
 @Injectable()
 export class ArticlesService {
@@ -57,6 +62,29 @@ export class ArticlesService {
 
     Object.assign(article, updateArticleDto, { slug });
     return await this.articleRepository.save(article);
+  }
+
+  async listArticles(
+    page: number = DEFAULT_PAGINATION_PAGE,
+    limit: number = DEFAULT_PAGINATION_LIMIT,
+  ): Promise<{ articles: Article[]; total: number }> {
+    const [articles, total] = await this.articleRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: DEFAULT_ORDER },
+    });
+
+    return { articles, total };
+  }
+
+  async deleteById(id: number, author: User): Promise<Article> {
+    const article = await this.findArticleOrFail(id);
+
+    if (article.authorId !== author.id) {
+      throw new ForbiddenException(this.i18n.t('article.forbidden'));
+    }
+
+    return await this.articleRepository.remove(article);
   }
 
   private generateSlug(title: string): string {

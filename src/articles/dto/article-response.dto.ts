@@ -10,7 +10,7 @@ export class ArticleResponseDto {
   @ApiProperty({ example: 'Article Description' })
   description: string;
 
-  @ApiProperty({ example: 'Article Slug' })
+  @ApiProperty({ example: 'article-slug' })
   slug: string;
 
   @ApiProperty({ example: ['tag1', 'tag2'] })
