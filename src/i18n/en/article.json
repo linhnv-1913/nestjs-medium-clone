@@ -1,5 +1,6 @@
 {
   "notFound": "Article not found",
   "duplicate_slug": "Article slug already exists",
-  "created": "Article created"
+  "created": "Article created",
+  "forbidden": "You are not authorized to update this article"
 }

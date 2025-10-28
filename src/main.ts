@@ -11,7 +11,7 @@ import {
 } from 'nestjs-i18n';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { HttpExceptionFilter } from './filter/http-exception.filter';
+import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
