@@ -1,0 +1,5 @@
+{
+  "created": "Comment created",
+  "notFound": "Comment not found",
+  "forbidden": "You are not authorized to delete this comment"
+}

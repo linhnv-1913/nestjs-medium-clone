@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   UseGuards,
-  ParseIntPipe,
   Put,
   Query,
   Delete,
@@ -42,17 +41,17 @@ export class ArticlesController {
     return await this.articlesService.create(createArticleDto, user);
   }
 
-  @Get(':id')
+  @Get(':slug')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get article by ID' })
+  @ApiOperation({ summary: 'Get article by slug' })
   @ApiResponse(SuccessResponse(200, 'Article found', ArticleResponseDto))
   @ApiResponse(ErrorResponse(404, 'Article not found'))
-  async findById(@Param('id', ParseIntPipe) id: number) {
-    return this.articlesService.findById(id);
+  async findBySlug(@Param('slug') slug: string) {
+    return this.articlesService.findBySlug(slug);
   }
 
-  @Put(':id')
+  @Put(':slug')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an existing article' })
@@ -64,10 +63,10 @@ export class ArticlesController {
   )
   async update(
     @Body() updateArticleDto: UpdateArticleDto,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('slug') slug: string,
     @CurrentUser() user: User,
   ) {
-    return await this.articlesService.update(updateArticleDto, id, user);
+    return await this.articlesService.update(updateArticleDto, slug, user);
   }
 
   @Get()
@@ -88,7 +87,7 @@ export class ArticlesController {
     );
   }
 
-  @Delete(':id')
+  @Delete(':slug')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an article' })
@@ -97,10 +96,7 @@ export class ArticlesController {
   @ApiResponse(
     ErrorResponse(403, 'You are not authorized to delete this article'),
   )
-  async delete(
-    @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() user: User,
-  ) {
-    return await this.articlesService.deleteById(id, user);
+  async delete(@Param('slug') slug: string, @CurrentUser() user: User) {
+    return await this.articlesService.delete(slug, user);
   }
 }
