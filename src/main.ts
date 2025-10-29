@@ -24,6 +24,7 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: DEFAULT_VERSION,
+    prefix: 'api/v',
   });
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));

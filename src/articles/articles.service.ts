@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -87,18 +88,6 @@ export class ArticlesService {
     return await this.articleRepository.remove(article);
   }
 
-  private generateSlug(title: string): string {
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-
-    const timestamp = Date.now();
-    return `${slug}-${timestamp}`;
-  }
-
   async findOrFailArticle(slug: string): Promise<Article> {
     const article = await this.articleRepository.findOne({
       where: { slug },
@@ -109,5 +98,46 @@ export class ArticlesService {
     }
 
     return article;
+  }
+
+  async favorite(slug: string, userId: number): Promise<Article> {
+    const article = await this.findOrFailArticle(slug);
+
+    if (article.userFavoriteIds.includes(userId)) {
+      throw new BadRequestException(this.i18n.t('article.alreadyFavorited'));
+    }
+
+    article.userFavoriteIds.push(userId);
+    article.favoritesCount += 1;
+    article.favorited = true;
+    return await this.articleRepository.save(article);
+  }
+
+  async unfavorite(slug: string, userId: number): Promise<Article> {
+    const article = await this.findOrFailArticle(slug);
+
+    if (!article.userFavoriteIds.includes(userId)) {
+      throw new BadRequestException(this.i18n.t('article.notFavorited'));
+    }
+
+    article.userFavoriteIds = article.userFavoriteIds.filter(
+      (id) => id !== userId,
+    );
+    article.favoritesCount = article.userFavoriteIds.length;
+    article.favorited = false;
+
+    return await this.articleRepository.save(article);
+  }
+
+  private generateSlug(title: string): string {
+    const slug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const timestamp = Date.now();
+    return `${slug}-${timestamp}`;
   }
 }

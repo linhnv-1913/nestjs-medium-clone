@@ -8,7 +8,7 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ length: USERNAME_MAX_LENGTH })
+  @Column({ length: USERNAME_MAX_LENGTH, unique: true })
   username: string;
 
   @Exclude()

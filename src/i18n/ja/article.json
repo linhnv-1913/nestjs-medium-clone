@@ -2,5 +2,7 @@
   "notFound": "記事が見つかりません",
   "duplicate_slug": "記事のスラッグは既に存在します",
   "created": "記事が作成されました",
-  "forbidden": "この記事を更新する権限がありません"
+  "forbidden": "この記事を更新する権限がありません",
+  "alreadyFavorited": "この記事は既にお気に入りに追加されています",
+  "notFavorited": "この記事はお気に入りに追加されていません"
 }

@@ -21,7 +21,7 @@ import {
 } from 'src/common/decorators/response.decorator';
 import { createListResponseDto } from 'src/common/dto/list-response.dto';
 
-@Controller('api/articles/:articleSlug/comments')
+@Controller('articles/:articleSlug/comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 

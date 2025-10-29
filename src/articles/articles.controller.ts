@@ -24,7 +24,7 @@ import {
 import { createListResponseDto } from 'src/common/dto/list-response.dto';
 import { ListRequestDto } from 'src/common/dto/list-request.dto';
 
-@Controller('api/articles')
+@Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
@@ -98,5 +98,27 @@ export class ArticlesController {
   )
   async delete(@Param('slug') slug: string, @CurrentUser() user: User) {
     return await this.articlesService.delete(slug, user);
+  }
+
+  @Post(':slug/favorite')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Favorite an article' })
+  @ApiResponse(SuccessResponse(200, 'Article favorited', ArticleResponseDto))
+  @ApiResponse(ErrorResponse(404, 'Article not found'))
+  @ApiResponse(ErrorResponse(400, 'You have already favorited this article'))
+  async favorite(@Param('slug') slug: string, @CurrentUser() user: User) {
+    return await this.articlesService.favorite(slug, user.id);
+  }
+
+  @Delete(':slug/favorite')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Unfavorite an article' })
+  @ApiResponse(SuccessResponse(200, 'Article unfavorited', ArticleResponseDto))
+  @ApiResponse(ErrorResponse(404, 'Article not found'))
+  @ApiResponse(ErrorResponse(400, 'You have not favorited this article'))
+  async unfavorite(@Param('slug') slug: string, @CurrentUser() user: User) {
+    return await this.articlesService.unfavorite(slug, user.id);
   }
 }
