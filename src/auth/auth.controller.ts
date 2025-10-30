@@ -8,7 +8,7 @@ import {
   SuccessResponse,
 } from '../common/decorators/response.decorator';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

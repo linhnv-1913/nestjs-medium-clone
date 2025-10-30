@@ -36,7 +36,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { ListRequestDto } from '../common/dto/list-request.dto';
 import { createListResponseDto } from '../common/dto/list-response.dto';
 
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

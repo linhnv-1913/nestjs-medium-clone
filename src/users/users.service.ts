@@ -40,7 +40,7 @@ export class UsersService {
     updateDto: Partial<UpdateDto>,
     file?: Express.Multer.File,
   ): Promise<User> {
-    const user = await this.findUserOrFail(userId);
+    const user = await this.findOrFailUser(userId);
 
     if (file) {
       if (user.image) {
@@ -73,10 +73,13 @@ export class UsersService {
     return { users, total };
   }
 
-  private async findUserOrFail(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-    });
+  async findOrFailUser(idOrUsername: number | string): Promise<User> {
+    const where =
+      typeof idOrUsername === 'number'
+        ? { id: idOrUsername }
+        : { username: idOrUsername };
+
+    const user = await this.userRepository.findOne({ where });
 
     if (!user) {
       throw new NotFoundException(this.i18n.t('user.notFound'));

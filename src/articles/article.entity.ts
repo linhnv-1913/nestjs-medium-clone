@@ -25,6 +25,9 @@ export class Article extends BaseEntity {
   @Column('simple-array', { nullable: true })
   tagList: string[];
 
+  @Column('simple-json', { default: '[]' })
+  userFavoriteIds: number[];
+
   @Column({ default: false })
   favorited: boolean;
 

@@ -2,5 +2,7 @@
   "notFound": "Article not found",
   "duplicate_slug": "Article slug already exists",
   "created": "Article created",
-  "forbidden": "You are not authorized to update this article"
+  "forbidden": "You are not authorized to update this article",
+  "alreadyFavorited": "You have already favorited this article",
+  "notFavorited": "You have not favorited this article"
 }
